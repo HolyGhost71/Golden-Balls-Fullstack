@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { io } from "socket.io-client";
+import Box from "@mui/material/Box";
+import { Button } from "@mui/material";
 
 const SocketComponent = () => {
   const [socket, setSocket] = useState(null);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
+
+  const [ballValues, setBallValues] = useState([]);
 
   useEffect(() => {
     // Establish a connection to the Flask-SocketIO server
@@ -15,8 +19,8 @@ const SocketComponent = () => {
     setSocket(newSocket);
 
     // Handle incoming messages
-    newSocket.on("ball_values", (msg) => {
-      setMessages((prevMessages) => [...prevMessages, msg]);
+    newSocket.on("ball_values", (val) => {
+      setBallValues((prevValues) => [...prevValues, val]);
     });
 
     // Handle incoming messages
@@ -48,20 +52,31 @@ const SocketComponent = () => {
 
   return (
     <div>
-      <h1>SocketIO Client</h1>
-      <input
-        type="text"
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        placeholder="Type a message"
-      />
-      <button onClick={sendMessage}>Send</button>
-      <h2>Messages:</h2>
-      <ul>
-        {messages.map((msg, index) => (
-          <li key={index}>{msg}</li>
+      <h1 className=".title">Golden Balls</h1>
+      <h4>Player 1 Balls:</h4>
+      <Box>
+        {ballValues[0].map((val, index) => (
+          <Button>{val}</Button>
         ))}
-      </ul>
+      </Box>
+      <h4>Player 2 Balls:</h4>
+      <Box>
+        {ballValues[1].map((val, index) => (
+          <Button>{val}</Button>
+        ))}
+      </Box>
+      <h4>Player 3 Balls:</h4>
+      <Box>
+        {ballValues[2].map((val, index) => (
+          <Button>{val}</Button>
+        ))}
+      </Box>
+      <h4>Player 4 Balls:</h4>
+      <Box>
+        {ballValues[3].map((val, index) => (
+          <Button>{val}</Button>
+        ))}
+      </Box>
     </div>
   );
 };
