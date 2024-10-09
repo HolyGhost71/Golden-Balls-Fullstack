@@ -25,7 +25,7 @@ class Bank:
         random.shuffle(self.ball_array)
 
 class GoldenBalls:
-    def __init__(self):
+    def __init__(self, socketio, clients):
         self.player_array = [Player("James"), Player("Luke"), Player("Emily"), Player("Jack")]
         self.bank = Bank()
         self.bank.randomize()
@@ -34,6 +34,9 @@ class GoldenBalls:
         self.total = 0
         self.remove_choices = defaultdict(int)
         self.vote_counter = 0
+
+        self.socketio = socketio
+        self.clients = clients
         
     def concat(self, list):
         message = ""
@@ -41,6 +44,12 @@ class GoldenBalls:
             message += (str(w) + " ")
         return message
     
+    def send_message_to_clients(self, command, sid, message):
+        if sid in self.clients:
+            self.socketio.emit(command, message, to=sid)  # Send message to specific client
+        else:
+            print(f"Client with sid {sid} not connected.")
+
     def play(self):
 
         for i, player in enumerate(self.player_array):
@@ -50,9 +59,9 @@ class GoldenBalls:
             
         self.show_balls_to_players()
 
-        # Send "VOTE" only once after all players' balls are sent
-        # for client in clients:
-        #     client.send("VOTE1".encode(FORMAT))   
+        for i in range (4):
+            client_sid = list(self.clients.keys())[i]  # Get the sid from clients by index
+            self.send_message_to_clients("vote_1", client_sid, "")
 
     def round_two(self):
         
@@ -68,10 +77,6 @@ class GoldenBalls:
             print(f"{i} | {balls}")
            
         self.show_balls_to_players()
-
-        # Send "VOTE" only once after all players' balls are sent
-        # for client in clients:
-        #     client.send("VOTE2".encode(FORMAT))   
         
     def bin_or_win(self):
         
@@ -155,5 +160,5 @@ class GoldenBalls:
                     message = f"Your balls:\t{self.concat(a_player.balls)}\n"
                 else:
                     message = f"{b_player.name}'s balls:\t{b_player.balls[0]} {b_player.balls[1]}\n"
-
-        time.sleep(0.5)    
+                client_sid = list(self.clients.keys())[i]  # Get the sid from clients by index
+                self.send_message_to_clients("ball_values", client_sid, message)

@@ -15,8 +15,13 @@ const SocketComponent = () => {
     setSocket(newSocket);
 
     // Handle incoming messages
-    newSocket.on("message", (msg) => {
+    newSocket.on("ball_values", (msg) => {
       setMessages((prevMessages) => [...prevMessages, msg]);
+    });
+
+    // Handle incoming messages
+    newSocket.on("vote_1", (msg) => {
+      setMessages((prevMessages) => [...prevMessages, "Time to vote"]);
     });
 
     // Handle connection events
